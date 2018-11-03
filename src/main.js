@@ -14,13 +14,8 @@ import './registerServiceWorker';
 Vue.use(Vuetify);
 Vue.use(VueCookie);
 Vue.use(VueResource);
+
 Vue.http.options.root = process.env.VUE_APP_API_URL;
-
-Vue.http.interceptors.push((request, next) => {
-  request.params['access_token'] = Vue.cookie.get('token');
-
-  next();
-});
 
 Vue.config.productionTip = false;
 

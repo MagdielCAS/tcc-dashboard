@@ -41,28 +41,7 @@
 
 <script>
 export default {
-  created() {
-    var options = {
-      url: `${process.env.VUE_APP_API_URL}/auth`,
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${btoa('teste:teste')}`
-      },
-      params: {
-        access_token: process.env.VUE_APP_MASTER_KEY
-      }
-    };
-    if (!this.$cookie.get('token')) {
-      this.$http(options).then(
-        res => {
-          this.$cookie.set('token', res.body.token, { expires: '1D' });
-        },
-        err => {
-          console.log(err);
-        }
-      );
-    }
-  },
+  created() {},
   data: () => ({
     drawer: false
   }),

@@ -10,6 +10,7 @@
 <script>
 import { GChart } from 'vue-google-charts';
 import TemperatureService from '@/services/Temperature/TemperatureService';
+import moment from 'moment';
 
 export default {
   name: 'home',
@@ -19,27 +20,37 @@ export default {
   created() {
     this.temperatureService = new TemperatureService(this.$resource);
 
+    moment.locale('pt-br');
+
     this.temperatureService.listAll().then(
       res => {
-        this.chartData = [['Date', 'Temperatures']].concat(
-          res.rows.map((el, index) => {
-            return [el.date, parseFloat(el.value)];
-          })
+        console.log(res);
+        var last = moment(res.rows[res.count - 1].date).valueOf();
+        var test = [['Hours', 'Value']];
+
+        test = test.concat(
+          res.rows
+            .map((el, index) => {
+              return [
+                `${(moment(el.date).valueOf() - last) / 3600000}`,
+                parseFloat(el.value)
+              ];
+            })
+            .reverse()
         );
+
+        this.chartData = test;
+        console.log(test);
       },
       err => {
         console.log(err);
       }
     );
   },
+  methods: {},
   data: () => ({
-    chartData: [
-      ['Year', 'Sales'],
-      ['2014', 1000],
-      ['2015', 1170],
-      ['2016', 660],
-      ['2017', 1030]
-    ]
+    client: undefined,
+    chartData: []
   })
 };
 </script>
