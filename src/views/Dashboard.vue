@@ -2,7 +2,9 @@
   <v-content class="home">
     <v-container>
     <span> <h1>Dashboard</h1></span>
-    <g-chart type="AreaChart" :data="chartData" />
+    <div class="container mx-auto px-16 ">
+      <g-chart type="AreaChart" :data="chartData" />
+    </div>
     </v-container>
   </v-content>
 </template>
@@ -24,23 +26,19 @@ export default {
 
     this.temperatureService.listAll().then(
       res => {
-        console.log(res);
         var last = moment(res.rows[res.count - 1].date).valueOf();
-        var test = [['Hours', 'Value']];
+        var temp = [['Hours', 'Value']];
 
-        test = test.concat(
+        this.chartData = temp.concat(
           res.rows
             .map((el, index) => {
               return [
-                `${(moment(el.date).valueOf() - last) / 3600000}`,
+                `${(moment(el.date).valueOf() - last) / 3600000}`, // convert the timestamp to hours passed
                 parseFloat(el.value)
               ];
             })
             .reverse()
         );
-
-        this.chartData = test;
-        console.log(test);
       },
       err => {
         console.log(err);

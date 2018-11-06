@@ -7,6 +7,14 @@
       app
     >
       <v-list dense>
+        <v-list-tile href="#/plant">
+          <v-list-tile-action>
+            <v-icon>developer_board</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Planta</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <v-list-tile href="#/" >
           <v-list-tile-action>
             <v-icon>dashboard</v-icon>
@@ -20,7 +28,7 @@
             <v-icon>settings</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Settings</v-list-tile-title>
+            <v-list-tile-title>Confugurações</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -40,6 +48,8 @@
 </style>
 
 <script>
+import '@/assets/styles/main.css';
+
 export default {
   created() {},
   data: () => ({

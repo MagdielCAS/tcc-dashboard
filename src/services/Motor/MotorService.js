@@ -11,12 +11,12 @@ export default class TemperatureService {
     return this._resource.query({ p: page, q: query }).then(res => res.json());
   }
 
-  save(patient) {
-    return this._resource.save(patient);
+  save(motor) {
+    return this._resource.save(motor);
   }
 
-  edit(id, patient) {
-    return this._resource.update({ id }, patient);
+  edit(id, motor) {
+    return this._resource.update({ id }, motor);
   }
 
   delete(id) {
