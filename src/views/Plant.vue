@@ -95,7 +95,7 @@
 
       <v-container fluid grid-list-xl>
         <v-layout row wrap>
-          <v-flex v-for="motor in motors" :key="motor.id" xs4 >
+          <v-flex v-for="motor in motors" :key="motor.id" sm4 xs12 >
             <v-card>
               <v-card-title primary-title>
                 <div>

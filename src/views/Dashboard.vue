@@ -11,14 +11,40 @@
         return-object
         label="Selecione o Motor"
       ></v-select> 
-      <div v-if="!!motor">
+      <v-container grid-list-xl fluid  v-if="!!motor">
         <span > <h2 >Sensores</h2></span>
-        <v-layout v-for="sensor in sensors" :key="sensor.id">
-          <h3> <span class="orange--text">{{`${sensor.label}: `}}</span> <span class="blue--text"> {{`${sensor.id}`}}</span> </h3> <br>
-          <div class="container mx-auto px-16 ">
-            <g-chart type="AreaChart" :data="sensor.readings" />
-          </div>
+        <v-layout column wrap>
+        <v-flex v-for="sensor in sensors" :key="sensor.id" xs10 >
+          <v-card>
+            <v-card-title primary-title>
+              <h3> <span class="orange--text">{{`${sensor.label}: `}}</span> <span class="blue--text"> {{`${sensor.id}`}}</span> </h3> <br>
+              <v-spacer />
+              <v-btn
+                  dark
+                  small
+                  fab
+                  absolute
+                  top
+                  right
+                  color="blue"
+                  @click="goToDetail(sensor)"
+                >
+                  <v-icon>show_chart</v-icon>
+                </v-btn>
+                <br>
+
+              <div class="container mx-auto px-16 ">
+                <g-chart type="AreaChart" :data="sensor.readings" />
+              </div>
+            </v-card-title>
+            <!-- <v-card-text>
+            </v-card-text> -->
+          </v-card>
+        </v-flex>
         </v-layout>
+      </v-container>
+      <div>
+        
       </div>
     </v-container>
   </v-content>
@@ -76,6 +102,9 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    goToDetail(sensor) {
+      console.log(sensor);
     }
   },
   data: () => ({
