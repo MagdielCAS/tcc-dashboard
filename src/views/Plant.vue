@@ -164,7 +164,6 @@ export default {
       .then(res => {
         this.motors = res.rows;
         this.motorsCount = res.count;
-        console.log(res);
       })
       .catch(err => {
         console.log(err);
@@ -191,7 +190,6 @@ export default {
       }
     },
     submitSensor() {
-      console.log(this.sensorType);
       if (this.$refs.form2.validate()) {
         this.sensorService
           .save({
@@ -216,15 +214,36 @@ export default {
       this.$refs.form2.reset();
     },
     deleteMotor(motor) {
-      console.log(motor.id);
       if (confirm(`Você deseja apagar o motor: ${motor.label}?`)) {
-        this.motorService
-          .delete(motor.id)
-          .then(result => {
-            this.motors = this.motors.filter(el => el.id !== motor.id); // remove motor from array
+        this.sensorService
+          .listAll({ motor: motor.id })
+          .then(res => {
+            var count = 0;
+            res.rows.forEach(element => {
+              this.sensorService
+                .delete(element.id)
+                .then(result => {
+                  count++;
+                  if (count === res.count) {
+                    this.motorService
+                      .delete(motor.id)
+                      .then(result => {
+                        this.motors = this.motors.filter(
+                          el => el.id !== motor.id
+                        ); // remove motor from array
+                      })
+                      .catch(err => {
+                        alert('Algo errado aconteceu, tente novamente.');
+                        console.log(err);
+                      });
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+            });
           })
           .catch(err => {
-            alert('Algo errado aconteceu, tente novamente.');
             console.log(err);
           });
       }

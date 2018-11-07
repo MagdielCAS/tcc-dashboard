@@ -6,8 +6,9 @@ Vue.use(Router);
 
 export default new Router({
   routes: [
+    { path: '/', redirect: '/plant' },
     {
-      path: '/',
+      path: '/dashboard',
       name: 'dashboard',
       component: Dashboard
     },

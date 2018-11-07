@@ -1,6 +1,6 @@
-export default class TemperatureService {
+export default class readingService {
   constructor(resource) {
-    this._resource = resource('sensors{/id}{?q,p}');
+    this._resource = resource('readings{/id}{?q,p}');
   }
 
   get(id) {
@@ -11,12 +11,12 @@ export default class TemperatureService {
     return this._resource.query(query).then(res => res.json());
   }
 
-  save(sensor) {
-    return this._resource.save(sensor);
+  save(reading) {
+    return this._resource.save(reading);
   }
 
-  edit(id, sensor) {
-    return this._resource.update({ id }, sensor);
+  edit(id, reading) {
+    return this._resource.update({ id }, reading);
   }
 
   delete(id) {

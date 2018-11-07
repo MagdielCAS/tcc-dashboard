@@ -15,7 +15,7 @@
             <v-list-tile-title>Planta</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile href="#/" >
+        <v-list-tile href="#/dashboard" >
           <v-list-tile-action>
             <v-icon>dashboard</v-icon>
           </v-list-tile-action>
