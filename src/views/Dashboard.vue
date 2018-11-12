@@ -19,21 +19,22 @@
             <v-card-title primary-title>
               <h3> <span class="orange--text">{{`${sensor.label}: `}}</span> <span class="blue--text"> {{`${sensor.id}`}}</span> </h3> <br>
               <v-spacer />
-              <v-btn
-                  dark
-                  small
-                  fab
-                  absolute
-                  top
-                  right
-                  color="blue"
-                  @click="goToDetail(sensor)"
-                >
-                  <v-icon>show_chart</v-icon>
-                </v-btn>
+              
+                <v-btn
+                    dark
+                    small
+                    fab
+                    absolute
+                    top
+                    right
+                    color="blue"
+                    @click="diagnosis(sensor)"
+                  >
+                    <v-icon>show_chart</v-icon>
+                  </v-btn>
                 <br>
 
-              <div class="container mx-auto px-16 ">
+              <div id="chart" class="container mx-auto px-16 ">
                 <g-chart type="AreaChart" :data="sensor.readings" />
               </div>
             </v-card-title>
@@ -51,17 +52,14 @@
 </template>
 
 <script>
-import { GChart } from 'vue-google-charts';
+import moment from 'moment';
+import { mapMutations } from 'vuex';
 import MotorService from '@/services/Motor/MotorService';
 import SensorService from '@/services/Sensor/SensorService';
 import ReadingService from '@/services/Reading/ReadingService';
-import moment from 'moment';
 
 export default {
-  name: 'home',
-  components: {
-    GChart
-  },
+  name: 'dashboard',
   created() {
     this.motorService = new MotorService(this.$resource);
     this.sensorService = new SensorService(this.$resource);
@@ -77,6 +75,7 @@ export default {
       });
   },
   methods: {
+    ...mapMutations(['updateSensor']),
     motorSelected() {
       this.sensorService
         .listAll({ motor: this.motor.id })
@@ -103,8 +102,9 @@ export default {
           console.log(err);
         });
     },
-    goToDetail(sensor) {
-      console.log(sensor);
+    diagnosis(sensor) {
+      this.updateSensor(sensor.id);
+      this.$router.push('diagnosis');
     }
   },
   data: () => ({

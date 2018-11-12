@@ -5,6 +5,7 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import VueCookie from 'vue-cookie';
 import VueResource from 'vue-resource';
+import VueGoogleCharts from 'vue-google-charts';
 
 import App from './App.vue';
 import router from './router';
@@ -14,6 +15,7 @@ import './registerServiceWorker';
 Vue.use(Vuetify);
 Vue.use(VueCookie);
 Vue.use(VueResource);
+Vue.use(VueGoogleCharts);
 
 Vue.http.options.root = process.env.VUE_APP_API_URL;
 

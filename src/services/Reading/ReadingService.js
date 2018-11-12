@@ -1,4 +1,4 @@
-export default class readingService {
+export default class ReadingService {
   constructor(resource) {
     this._resource = resource('readings{/id}{?q,p}');
   }

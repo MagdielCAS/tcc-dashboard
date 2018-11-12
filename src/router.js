@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import { Plant, Settings, Dashboard } from './views';
+import { Plant, Settings, Dashboard, Diagnosis } from './views';
 
 Vue.use(Router);
 
@@ -11,6 +11,11 @@ export default new Router({
       path: '/dashboard',
       name: 'dashboard',
       component: Dashboard
+    },
+    {
+      path: '/diagnosis',
+      name: 'diagnosis',
+      component: Diagnosis
     },
     {
       path: '/settings',

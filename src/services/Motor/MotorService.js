@@ -1,4 +1,4 @@
-export default class TemperatureService {
+export default class MotorService {
   constructor(resource) {
     this._resource = resource('motors{/id}{?q,p}');
   }

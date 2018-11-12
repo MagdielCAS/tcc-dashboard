@@ -5,8 +5,9 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    page: '',
-    temperature: 0
+    page: undefined,
+    temperature: undefined,
+    sensor: undefined
   },
   mutations: {
     updatePage(state, { name }) {
@@ -14,6 +15,9 @@ export default new Vuex.Store({
     },
     updateTemperature(state, { temperature }) {
       state.temperature = temperature;
+    },
+    updateSensor(state, sensor) {
+      state.sensor = sensor;
     }
   },
   actions: {}
