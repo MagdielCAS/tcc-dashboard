@@ -25,6 +25,7 @@ import _ from 'lodash';
 import { mapState } from 'vuex';
 import ReadingService from '@/services/Reading/ReadingService';
 import LsCalculationService from '@/services/LsCalculation/LsCalculationService';
+import Tensorflow from '@/services/Tensorflow';
 
 export default {
   name: 'diagnosis',
@@ -71,6 +72,7 @@ export default {
     },
     prepareDataToChart(data) {
       var temp = ['Horas', 'Valor Estimado', 'Valor Real'];
+      console.log(data);
       data = data.map((el, index) => {
         if (index < this.rmsData.length) {
           return [...el, parseFloat(this.rmsData[index].value)];
@@ -106,6 +108,53 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    predictRNN() {
+      var input = [];
+      var output = [];
+      var min = 1000;
+      var max = 0;
+      var predict = 250;
+
+      this.rmsData.forEach((el, index) => {
+        input.push(parseFloat(el.date));
+        output.push(parseFloat(el.value));
+        if (output[index] <= min) {
+          min = output[index];
+        }
+        if (output[index] >= max) {
+          max = output[index];
+        }
+      });
+      var steps = new Array(predict / 25)
+        .fill(1)
+        .map((el, index) => input[input.length - 1] + 25 + index * 25);
+      steps = input.concat(steps);
+      try {
+        var rnn = new Tensorflow(
+          min - 10,
+          max + 100,
+          input[0],
+          input[input.length - 1] + predict
+        );
+        rnn.createAndCompileModel(20);
+        rnn
+          .train(input, output)
+          .then(res => {
+            console.log(res.stats);
+            return rnn.predict(steps);
+          })
+          .then(res => {
+            console.log(res);
+            var data = res.map((el, index) => [steps[index], el]);
+            this.prepareDataToChart(data);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 };
