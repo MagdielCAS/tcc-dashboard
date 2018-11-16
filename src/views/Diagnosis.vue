@@ -25,6 +25,7 @@ import _ from 'lodash';
 import { mapState } from 'vuex';
 import ReadingService from '@/services/Reading/ReadingService';
 import LsCalculationService from '@/services/LsCalculation/LsCalculationService';
+import LsArxCalculationService from '@/services/LsCalculation/LsArxCalculationService';
 import Tensorflow from '@/services/Tensorflow';
 
 export default {
@@ -37,13 +38,18 @@ export default {
     preds: [
       {
         label:
-          'Aproximação por Minimos Quadrados Polinomial y = x² + x + 1 + cos(x)',
+          'Aproximação por Minimos Quadrados Polinomial',
         value: 1
       },
       {
-        label: 'Rede Neural Recorrente',
+        label: 'Minimos Quadrados Auto-regressivo',
         value: 2
-      }
+      },
+      {
+        label: 'Rede Neural Recorrente',
+        value: 3
+      },
+
     ]
   }),
   computed: {
@@ -52,6 +58,7 @@ export default {
   created() {
     this.readingService = new ReadingService(this.$resource);
     this.lscalculationService = new LsCalculationService(this.$resource);
+    this.lsarxcalculationService = new LsArxCalculationService(this.$resource);
 
     if (_.isEmpty(this.sensor)) {
       this.$router.push('dashboard');
@@ -71,13 +78,14 @@ export default {
       this.google = google;
     },
     prepareDataToChart(data) {
+      this.chartData = []
       var temp = ['Horas', 'Valor Estimado', 'Valor Real'];
       console.log(data);
       data = data.map((el, index) => {
         if (index < this.rmsData.length) {
           return [...el, parseFloat(this.rmsData[index].value)];
         } else {
-          return [...el, 0];
+          return [...el, undefined];
         }
       });
 
@@ -91,6 +99,9 @@ export default {
           this.predictLSP();
           break;
         case 2:
+          this.predictLSARX();
+          break;
+        case 3:
           this.predictRNN();
           break;
         default:
@@ -100,6 +111,18 @@ export default {
     predictLSP() {
       console.log(this.google);
       this.lscalculationService
+        .calculate({ sensor: this.sensor, predict: 250 })
+        .then(res => {
+          this.prepareDataToChart(res.body.result);
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    predictLSARX() {
+      console.log(this.google);
+      this.lsarxcalculationService
         .calculate({ sensor: this.sensor, predict: 250 })
         .then(res => {
           this.prepareDataToChart(res.body.result);
