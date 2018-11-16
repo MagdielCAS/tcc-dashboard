@@ -62,7 +62,7 @@ export default class rnn {
       })
     );
 
-    const opt = tf.train.adadelta(1e-3);
+    const opt = tf.train.adadelta(1.8e-3);
     this.model.compile({ optimizer: opt, loss: 'meanSquaredError' });
 
     return this.model;
@@ -81,11 +81,11 @@ export default class rnn {
     var stats = await this.model.fit(xs, ys, {
       epochs: 10000,
       batchSize: 100,
-      callbacks: {
-        onEpochEnd: async (epoch, logs) => {
-          console.log(logs);
-        }
-      }
+      // callbacks: {
+      //   onEpochEnd: async (epoch, logs) => {
+      //     console.log(logs);
+      //   }
+      // }
     });
 
     xs.dispose();
