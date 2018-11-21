@@ -1,7 +1,12 @@
 <template>
   <v-content class="diagnosis">
+    <v-progress-linear
+    :active="showProgress"
+    :indeterminate="true"
+  ></v-progress-linear>
     <v-container fluid>
       <h1>Diagnóstico</h1>
+      <br>
       <v-select
         v-model="predModel"
         :items="preds"
@@ -11,11 +16,19 @@
         return-object
         label="Selecione o método de identificação do sistema."
       ></v-select> 
+      <h2>Gráfico RMS da leitura de vibração</h2>
       <v-layout>
-      <div class="container mx-auto px-16" >
-        <g-chart type="AreaChart" :data="chartData" @ready="onChartReady" />
-      </div>
+        <div class="container mx-auto px-16" >
+          <g-chart type="AreaChart" :data="chartData" @ready="onChartReady" />
+        </div>
       </v-layout>
+      <h2>Gráfico delta RMS</h2>
+      <v-layout>
+        <div class="container mx-auto px-16" >
+          <g-chart type="AreaChart" :data="chartDelta" />
+        </div>
+      </v-layout>
+      <h1 v-if="!!previsao">{{`Previsão para próxima falha: ${previsao} horas`}}</h1>
     </v-container>
   </v-content>
 </template>
@@ -34,7 +47,10 @@ import Tensorflow from '@/services/Tensorflow';
 export default {
   name: 'diagnosis',
   data: () => ({
+    previsao: undefined,
+    showProgress: false,
     chartData: [],
+    chartDelta: [],
     rmsData: [],
     predModel: undefined,
     google: undefined,
@@ -81,9 +97,14 @@ export default {
     },
     prepareDataToChart(data) {
       this.chartData = [];
+      this.chartDelta = [];
       var temp = ['Horas', 'Valor Estimado', 'Valor Real'];
       console.log(data);
+      var prevRMS = 0;
       data = data.map((el, index) => {
+        if (el[1] >= 200 && prevRMS === 0 && index >= this.rmsData.length) {
+          prevRMS = el[0];
+        }
         if (index < this.rmsData.length) {
           return [...el, parseFloat(this.rmsData[index].value)];
         } else {
@@ -93,9 +114,33 @@ export default {
 
       this.chartData.push(temp);
       this.chartData = this.chartData.concat(data);
-      console.log(this.chartData);
+      var prevDelta = 0;
+      var delta = this.chartData.map((el, index) => {
+        if (el[1] >= 20 && prevDelta === 0 && index >= this.rmsData.length) {
+          prevDelta = el[0];
+        }
+        if (index >= 2) {
+          return [
+            el[0],
+            Math.abs(el[1] - this.chartData[index - 1][1]),
+            Math.abs(el[2] - this.chartData[index - 1][2])
+          ];
+        } else {
+          return [0, 0, 0];
+        }
+      });
+      console.log(prevRMS);
+      console.log(prevDelta);
+      this.previsao =
+        (prevRMS + prevDelta) / 2 - this.chartData[this.rmsData.length - 1][0];
+      delta.shift();
+      delta.shift();
+      this.chartDelta.push(temp);
+      this.chartDelta = this.chartDelta.concat(delta);
+      this.showProgress = false;
     },
     modeSelected(mode) {
+      this.showProgress = true;
       switch (mode.value) {
         case 1:
           this.predictLSP();
@@ -115,7 +160,6 @@ export default {
         .calculate({ sensor: this.sensor, predict: 250 })
         .then(res => {
           this.prepareDataToChart(res.body.result);
-          console.log(res);
         })
         .catch(err => {
           console.log(err);
@@ -126,7 +170,6 @@ export default {
         .calculate({ sensor: this.sensor, predict: 250 })
         .then(res => {
           this.prepareDataToChart(res.body.result);
-          console.log(res);
         })
         .catch(err => {
           console.log(err);
@@ -137,7 +180,6 @@ export default {
         .calculate({ sensor: this.sensor, predict: 250 })
         .then(res => {
           this.prepareDataToChart(res.body.result);
-          console.log(res);
         })
         .catch(err => {
           console.log(err);
