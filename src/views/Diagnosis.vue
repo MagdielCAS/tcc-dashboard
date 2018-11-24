@@ -16,6 +16,27 @@
         return-object
         label="Selecione o método de identificação do sistema."
       ></v-select> 
+      <v-layout row wrap>
+        <v-flex >
+<v-container fluid>
+          <v-text-field
+            label="Número de horas para prever"
+            v-model="predict"
+          ></v-text-field>
+  </v-container>
+        </v-flex>
+
+        <v-flex >
+<v-container fluid>
+
+          <v-text-field
+            label="Limite de valor RMS"
+            v-model="limiar"
+          ></v-text-field>
+  </v-container>
+
+        </v-flex>
+      </v-layout>
       <h2>Gráfico RMS da leitura de vibração</h2>
       <v-layout>
         <div class="container mx-auto px-16" >
@@ -47,6 +68,8 @@ import Tensorflow from '@/services/Tensorflow';
 export default {
   name: 'diagnosis',
   data: () => ({
+    predict: 250,
+    limiar: 200,
     previsao: undefined,
     showProgress: false,
     chartData: [],
@@ -102,7 +125,7 @@ export default {
       console.log(data);
       var prevRMS = 0;
       data = data.map((el, index) => {
-        if (el[1] >= 200 && prevRMS === 0 && index >= this.rmsData.length) {
+        if (el[1] >= parseFloat(this.limiar) && prevRMS === 0 && index >= this.rmsData.length) {
           prevRMS = el[0];
         }
         if (index < this.rmsData.length) {
@@ -114,11 +137,7 @@ export default {
 
       this.chartData.push(temp);
       this.chartData = this.chartData.concat(data);
-      var prevDelta = 0;
       var delta = this.chartData.map((el, index) => {
-        if (el[1] >= 20 && prevDelta === 0 && index >= this.rmsData.length) {
-          prevDelta = el[0];
-        }
         if (index >= 2) {
           return [
             el[0],
@@ -129,10 +148,8 @@ export default {
           return [0, 0, 0];
         }
       });
-      console.log(prevRMS);
-      console.log(prevDelta);
-      this.previsao =
-        (prevRMS + prevDelta) / 2 - this.chartData[this.rmsData.length - 1][0];
+      this.previsao = prevRMS  - this.chartData[this.rmsData.length - 1][0];
+      this.previsao = this.previsao > 0 ? this.previsao : undefined;
       delta.shift();
       delta.shift();
       this.chartDelta.push(temp);
@@ -157,7 +174,7 @@ export default {
     },
     predictLSP() {
       this.lscalculationService
-        .calculate({ sensor: this.sensor, predict: 250 })
+        .calculate({ sensor: this.sensor, predict: parseInt(this.predict) })
         .then(res => {
           this.prepareDataToChart(res.body.result);
         })
@@ -167,7 +184,7 @@ export default {
     },
     predictLSARX() {
       this.lsarxcalculationService
-        .calculate({ sensor: this.sensor, predict: 250 })
+        .calculate({ sensor: this.sensor, predict: parseInt(this.predict) })
         .then(res => {
           this.prepareDataToChart(res.body.result);
         })
@@ -177,7 +194,7 @@ export default {
     },
     predictRNN() {
       this.rnncalculationService
-        .calculate({ sensor: this.sensor, predict: 250 })
+        .calculate({ sensor: this.sensor, predict: parseInt(this.predict) })
         .then(res => {
           this.prepareDataToChart(res.body.result);
         })
